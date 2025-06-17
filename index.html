@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>People First Healthcare | HR Analytics Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals (Slate, Zinc, Stone) with a Teal accent -->
+    <!-- Application Structure Plan: A single-page dashboard with a top navigation bar linking to anchor-tagged sections. The structure is: 1) Overview: High-level KPIs for at-a-glance understanding. 2) Retention Analysis: Interactive bar chart to compare turnover by department and location. 3) Recruitment Performance: Trend lines and a breakdown of hiring sources. 4) Employee Engagement: Comparative view of satisfaction scores. This task-oriented structure allows the HR Director to either get a quick summary or dive deep into specific areas of concern, making it more usable than a linear report. -->
+    <!-- Visualization & Content Choices: 
+        - Overall Satisfaction: Goal: Inform. Viz: Donut chart acting as a gauge. Justification: Visually engaging way to show a single key metric. Library: Chart.js.
+        - Turnover Rate: Goal: Compare. Viz: Bar chart. Interaction: JS-powered buttons to toggle data between 'Department' and 'Location' views. Justification: Bar charts are best for direct comparison; interactivity allows drilling into context without cluttering the UI. Library: Chart.js.
+        - Recruitment Trends: Goal: Show Change. Viz: Dual-axis Line chart. Justification: Effectively shows trends of two different metrics (Days vs. Dollars) over the same time period. Library: Chart.js.
+        - Hire Source: Goal: Show Proportion. Viz: Donut Chart. Justification: Clearly shows parts of a whole for recruitment strategy. Library: Chart.js.
+        - Satisfaction Categories: Goal: Compare. Viz: Grouped Bar Chart. Justification: Best method to compare multiple categories across two distinct groups (locations). Library: Chart.js.
+        - Insights: Goal: Provide Context. Viz: Text blocks. Interaction: Dynamically updated with chart views. Justification: Connects quantitative data to qualitative findings from the report. Method: Vanilla JS. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 50vh;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 300px;
+            }
+        }
+        .nav-link {
+            transition: all 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active, .nav-link:hover {
+            border-bottom-color: #14b8a6; /* teal-500 */
+            color: #0f172a; /* slate-900 */
+        }
+        .kpi-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .kpi-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body class="text-slate-700">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-10 shadow-sm">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-xl font-bold text-slate-800">People First Healthcare</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#overview" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-600">Overview</a>
+                        <a href="#retention" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-600">Retention</a>
+                        <a href="#recruitment" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-600">Recruitment</a>
+                        <a href="#engagement" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-600">Engagement</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+        
+        <section id="overview" class="mb-16 scroll-mt-16">
+            <h1 class="text-3xl font-bold text-slate-900 mb-2">HR Analytics Overview</h1>
+            <p class="text-lg text-slate-600 mb-8">An at-a-glance summary of key workforce metrics for the last quarter.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="kpi-card">
+                    <h3 class="text-sm font-medium text-slate-500 uppercase">Quarterly Turnover Rate</h3>
+                    <p class="text-4xl font-bold text-slate-800 mt-2">4.9%</p>
+                    <p class="text-xs text-slate-500 mt-1">20 separations from 410 employees</p>
+                </div>
+                <div class="kpi-card">
+                    <h3 class="text-sm font-medium text-slate-500 uppercase">Avg. Time-to-Hire</h3>
+                    <p class="text-4xl font-bold text-slate-800 mt-2">46 <span class="text-2xl font-medium">Days</span></p>
+                    <p class="text-xs text-green-600 mt-1">Improved from 55 days last quarter</p>
+                </div>
+                <div class="kpi-card">
+                    <h3 class="text-sm font-medium text-slate-500 uppercase">Avg. Cost-per-Hire</h3>
+                    <p class="text-4xl font-bold text-slate-800 mt-2">$4,100</p>
+                    <p class="text-xs text-green-600 mt-1">Down from $4,800 last quarter</p>
+                </div>
+                <div class="kpi-card flex flex-col items-center justify-center">
+                     <h3 class="text-sm font-medium text-slate-500 uppercase mb-2">Overall Satisfaction</h3>
+                     <div class="relative w-28 h-28">
+                         <canvas id="satisfactionGauge"></canvas>
+                         <div id="satisfactionGaugeText" class="absolute inset-0 flex items-center justify-center text-3xl font-bold text-slate-800"></div>
+                     </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="retention" class="mb-16 scroll-mt-16">
+            <h2 class="text-2xl font-bold text-slate-900 mb-2">Retention Analysis</h2>
+            <p class="text-slate-600 mb-6">This section explores employee turnover from the last quarter. Use the buttons below to switch between viewing turnover rates by department and by location to identify specific areas of concern.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="flex justify-center space-x-2 mb-6">
+                    <button id="viewByDeptBtn" class="bg-teal-500 text-white px-4 py-2 rounded-md text-sm font-medium">View by Department</button>
+                    <button id="viewByLocationBtn" class="bg-slate-200 text-slate-700 px-4 py-2 rounded-md text-sm font-medium">View by Location</button>
+                </div>
+                <div class="chart-container">
+                    <canvas id="turnoverChart"></canvas>
+                </div>
+                <div id="turnoverInsight" class="mt-6 p-4 bg-slate-50 rounded-md border border-slate-200">
+                    <h4 class="font-semibold text-slate-800 mb-1">Key Insight</h4>
+                    <p class="text-sm text-slate-600"></p>
+                </div>
+            </div>
+        </section>
+
+        <section id="recruitment" class="mb-16 scroll-mt-16">
+            <h2 class="text-2xl font-bold text-slate-900 mb-2">Recruitment Performance</h2>
+            <p class="text-slate-600 mb-6">Here we track hiring efficiency and effectiveness over the past year. The data reveals trends in our hiring process and which sources provide the most value.</p>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="font-semibold text-slate-800 mb-4 text-center">Time-to-Hire & Cost-per-Hire Trends</h3>
+                    <div class="chart-container" style="height: 320px;">
+                        <canvas id="recruitmentTrendChart"></canvas>
+                    </div>
+                     <div class="mt-6 p-4 bg-slate-50 rounded-md border border-slate-200">
+                        <h4 class="font-semibold text-slate-800 mb-1">Key Insight</h4>
+                        <p class="text-sm text-slate-600">The recruitment team has successfully reduced both the time-to-hire and cost-per-hire in the most recent quarter, indicating improved process efficiency.</p>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="font-semibold text-slate-800 mb-4 text-center">Top Hire Sources (Q1)</h3>
+                    <div class="chart-container" style="height: 320px;">
+                        <canvas id="hireSourceChart"></canvas>
+                    </div>
+                     <div class="mt-6 p-4 bg-slate-50 rounded-md border border-slate-200">
+                        <h4 class="font-semibold text-slate-800 mb-1">Key Insight</h4>
+                        <p class="text-sm text-slate-600">Employee referrals are the most effective hiring source, suggesting the referral program provides a strong return on investment.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="engagement" class="scroll-mt-16">
+            <h2 class="text-2xl font-bold text-slate-900 mb-2">Employee Engagement</h2>
+             <p class="text-slate-600 mb-6">This chart breaks down the results from our latest employee survey, comparing satisfaction levels across key categories at our two main locations.</p>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="font-semibold text-slate-800 mb-4 text-center">Satisfaction Scores by Location</h3>
+                <div class="chart-container">
+                    <canvas id="satisfactionDetailChart"></canvas>
+                </div>
+                 <div class="mt-6 p-4 bg-slate-50 rounded-md border border-slate-200">
+                    <h4 class="font-semibold text-slate-800 mb-1">Key Insight</h4>
+                    <p class="text-sm text-slate-600">Overall satisfaction is positive. However, employees at the General Hospital report lower satisfaction with Work-Life Balance and Career Growth Opportunities compared to the City Clinic. This correlates with higher turnover at that location and highlights specific areas for HR intervention.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-800 text-white mt-16">
+        <div class="container mx-auto py-4 px-6 text-center text-sm">
+            <p>&copy; 2025 People First Healthcare. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const dataStore = {
+                turnover: {
+                    byDept: {
+                        labels: ['Nursing', 'Physicians', 'Administration', 'Support Staff'],
+                        datasets: [{
+                            label: 'Turnover Rate by Dept (%)',
+                            data: [5.8, 2.2, 6.7, 7.3],
+                            backgroundColor: 'rgba(20, 184, 166, 0.6)',
+                            borderColor: 'rgba(13, 148, 136, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    byLocation: {
+                        labels: ['General Hospital', 'City Clinic'],
+                        datasets: [{
+                            label: 'Turnover Rate by Location (%)',
+                            data: [5.6, 3.8],
+                            backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                            borderColor: 'rgba(37, 99, 235, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    insights: {
+                        byDept: 'Turnover is highest among Support Staff and Administration, suggesting these roles may require further investigation into job satisfaction and workload.',
+                        byLocation: 'The data clearly shows that turnover is a more significant issue at the General Hospital compared to the City Clinic, pointing to location-specific factors that need to be addressed.'
+                    }
+                },
+                recruitment: {
+                    trends: {
+                        labels: ['Q2 (Last Yr)', 'Q3 (Last Yr)', 'Q4 (Last Yr)', 'Q1 (This Yr)'],
+                        datasets: [{
+                            label: 'Avg. Time-to-Hire (Days)',
+                            data: [52, 48, 55, 46],
+                            borderColor: 'rgba(20, 184, 166, 1)',
+                            backgroundColor: 'rgba(20, 184, 166, 0.1)',
+                            yAxisID: 'yDays',
+                            tension: 0.1
+                        }, {
+                            label: 'Avg. Cost-per-Hire ($)',
+                            data: [4500, 4200, 4800, 4100],
+                            borderColor: 'rgba(234, 179, 8, 1)',
+                            backgroundColor: 'rgba(234, 179, 8, 0.1)',
+                            yAxisID: 'yCost',
+                            tension: 0.1
+                        }]
+                    },
+                    sources: {
+                        labels: ['Employee Referrals', 'Online Job Boards', 'LinkedIn', 'Company Career Site', 'Other'],
+                        datasets: [{
+                            label: '% of Hires',
+                            data: [35, 30, 20, 10, 5],
+                            backgroundColor: ['#14b8a6', '#60a5fa', '#f59e0b', '#a78bfa', '#9ca3af'],
+                        }]
+                    }
+                },
+                satisfaction: {
+                    overall: 3.8,
+                    byCategory: {
+                        labels: ['Work-Life Balance', 'Management', 'Compensation & Benefits', 'Career Growth', 'Team Collaboration'],
+                        datasets: [{
+                            label: 'General Hospital',
+                            data: [3.5, 3.7, 3.9, 3.2, 4.2],
+                            backgroundColor: 'rgba(20, 184, 166, 0.6)',
+                            borderColor: 'rgba(13, 148, 136, 1)',
+                            borderWidth: 1
+                        }, {
+                            label: 'City Clinic',
+                            data: [4.1, 4.0, 3.9, 3.8, 4.4],
+                            backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                            borderColor: 'rgba(37, 99, 235, 1)',
+                            borderWidth: 1
+                        }]
+                    }
+                }
+            };
+            
+            let turnoverChartInstance;
+
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            };
+
+            function createTurnoverChart(view) {
+                const ctx = document.getElementById('turnoverChart').getContext('2d');
+                if (turnoverChartInstance) {
+                    turnoverChartInstance.destroy();
+                }
+                const chartData = view === 'byDept' ? dataStore.turnover.byDept : dataStore.turnover.byLocation;
+                turnoverChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: chartData,
+                    options: {
+                        ...chartOptions,
+                         scales: {
+                            y: { 
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Turnover Rate (%)'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.dataset.label}: ${context.raw}%`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                document.querySelector('#turnoverInsight p').textContent = view === 'byDept' ? dataStore.turnover.insights.byDept : dataStore.turnover.insights.byLocation;
+            }
+
+            const viewByDeptBtn = document.getElementById('viewByDeptBtn');
+            const viewByLocationBtn = document.getElementById('viewByLocationBtn');
+
+            viewByDeptBtn.addEventListener('click', () => {
+                createTurnoverChart('byDept');
+                viewByDeptBtn.classList.add('bg-teal-500', 'text-white');
+                viewByDeptBtn.classList.remove('bg-slate-200', 'text-slate-700');
+                viewByLocationBtn.classList.add('bg-slate-200', 'text-slate-700');
+                viewByLocationBtn.classList.remove('bg-teal-500', 'text-white');
+            });
+            
+            viewByLocationBtn.addEventListener('click', () => {
+                createTurnoverChart('byLocation');
+                viewByLocationBtn.classList.add('bg-teal-500', 'text-white');
+                viewByLocationBtn.classList.remove('bg-slate-200', 'text-slate-700');
+                viewByDeptBtn.classList.add('bg-slate-200', 'text-slate-700');
+                viewByDeptBtn.classList.remove('bg-teal-500', 'text-white');
+            });
+
+            createTurnoverChart('byDept');
+
+            function createRecruitmentTrendChart() {
+                const ctx = document.getElementById('recruitmentTrendChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: dataStore.recruitment.trends,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                        scales: {
+                            yDays: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'Days'
+                                }
+                            },
+                            yCost: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                title: {
+                                    display: true,
+                                    text: 'USD ($)'
+                                },
+                                grid: {
+                                    drawOnChartArea: false, 
+                                }
+                            }
+                        },
+                        plugins: { legend: { position: 'bottom' } }
+                    }
+                });
+            }
+            createRecruitmentTrendChart();
+            
+            function createHireSourceChart() {
+                const ctx = document.getElementById('hireSourceChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: dataStore.recruitment.sources,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    boxWidth: 12
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            createHireSourceChart();
+
+            function createSatisfactionDetailChart() {
+                const ctx = document.getElementById('satisfactionDetailChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: dataStore.satisfaction.byCategory,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                         scales: {
+                            y: { 
+                                beginAtZero: true,
+                                max: 5,
+                                title: {
+                                    display: true,
+                                    text: 'Satisfaction Score (out of 5)'
+                                }
+                            }
+                        },
+                        plugins: { legend: { position: 'bottom' } }
+                    }
+                });
+            }
+            createSatisfactionDetailChart();
+
+            function createSatisfactionGauge() {
+                const score = dataStore.satisfaction.overall;
+                const scoreText = document.getElementById('satisfactionGaugeText');
+                scoreText.textContent = score.toFixed(1);
+
+                const ctx = document.getElementById('satisfactionGauge').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        datasets: [{
+                            data: [score, 5 - score],
+                            backgroundColor: ['#14b8a6', '#e2e8f0'],
+                            borderWidth: 0,
+                            circumference: 180,
+                            rotation: 270,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        aspectRatio: 2,
+                        cutout: '80%',
+                        plugins: {
+                            tooltip: { enabled: false }
+                        }
+                    }
+                });
+            }
+            createSatisfactionGauge();
+
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section');
+
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if(pageYOffset >= sectionTop - 80){
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if(link.getAttribute('href').includes(current)){
+                        link.classList.add('active');
+                    }
+                })
+            });
+
+        });
+    </script>
+</body>
+</html>
