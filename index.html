@@ -183,6 +183,22 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
+            // Define an array of red tones for use in charts
+            const redTones = [
+                'rgba(239, 68, 68, 0.8)',   // red-500
+                'rgba(220, 38, 38, 0.8)',   // red-600
+                'rgba(185, 28, 28, 0.8)',   // red-700
+                'rgba(153, 27, 27, 0.8)',   // red-800
+                'rgba(127, 29, 29, 0.8)'    // red-900
+            ];
+            const redTonesLight = [
+                'rgba(239, 68, 68, 0.4)',
+                'rgba(220, 38, 38, 0.4)',
+                'rgba(185, 28, 28, 0.4)',
+                'rgba(153, 27, 27, 0.4)',
+                'rgba(127, 29, 29, 0.4)'
+            ];
+
             const dataStore = {
                 turnover: {
                     byDept: {
@@ -190,8 +206,8 @@
                         datasets: [{
                             label: 'Turnover Rate by Dept (%)',
                             data: [5.8, 2.2, 6.7, 7.3],
-                            backgroundColor: 'rgba(20, 184, 166, 0.6)',
-                            borderColor: 'rgba(13, 148, 136, 1)',
+                            backgroundColor: redTones.slice(0, 4),
+                            borderColor: redTones.map(c => c.replace('0.8', '1')),
                             borderWidth: 1
                         }]
                     },
@@ -200,8 +216,8 @@
                         datasets: [{
                             label: 'Turnover Rate by Location (%)',
                             data: [5.6, 3.8],
-                            backgroundColor: 'rgba(59, 130, 246, 0.6)',
-                            borderColor: 'rgba(37, 99, 235, 1)',
+                            backgroundColor: [redTones[0], redTones[1]],
+                            borderColor: [redTones[0].replace('0.8', '1'), redTones[1].replace('0.8', '1')],
                             borderWidth: 1
                         }]
                     },
@@ -216,15 +232,15 @@
                         datasets: [{
                             label: 'Avg. Time-to-Hire (Days)',
                             data: [52, 48, 55, 46],
-                            borderColor: 'rgba(20, 184, 166, 1)',
-                            backgroundColor: 'rgba(20, 184, 166, 0.1)',
+                            borderColor: redTones[0].replace('0.8', '1'),
+                            backgroundColor: redTonesLight[0],
                             yAxisID: 'yDays',
                             tension: 0.1
                         }, {
                             label: 'Avg. Cost-per-Hire ($)',
                             data: [4500, 4200, 4800, 4100],
-                            borderColor: 'rgba(234, 179, 8, 1)',
-                            backgroundColor: 'rgba(234, 179, 8, 0.1)',
+                            borderColor: redTones[2].replace('0.8', '1'),
+                            backgroundColor: redTonesLight[2],
                             yAxisID: 'yCost',
                             tension: 0.1
                         }]
@@ -234,7 +250,7 @@
                         datasets: [{
                             label: '% of Hires',
                             data: [35, 30, 20, 10, 5],
-                            backgroundColor: ['#14b8a6', '#60a5fa', '#f59e0b', '#a78bfa', '#9ca3af'],
+                            backgroundColor: redTones,
                         }]
                     }
                 },
@@ -245,14 +261,14 @@
                         datasets: [{
                             label: 'General Hospital',
                             data: [3.5, 3.7, 3.9, 3.2, 4.2],
-                            backgroundColor: 'rgba(20, 184, 166, 0.6)',
-                            borderColor: 'rgba(13, 148, 136, 1)',
+                            backgroundColor: redTones[1],
+                            borderColor: redTones[1].replace('0.8', '1'),
                             borderWidth: 1
                         }, {
                             label: 'City Clinic',
                             data: [4.1, 4.0, 3.9, 3.8, 4.4],
-                            backgroundColor: 'rgba(59, 130, 246, 0.6)',
-                            borderColor: 'rgba(37, 99, 235, 1)',
+                            backgroundColor: redTones[3],
+                            borderColor: redTones[3].replace('0.8', '1'),
                             borderWidth: 1
                         }]
                     }
@@ -427,7 +443,7 @@
                     data: {
                         datasets: [{
                             data: [score, 5 - score],
-                            backgroundColor: ['#14b8a6', '#e2e8f0'],
+                            backgroundColor: [redTones[2], '#e2e8f0'],
                             borderWidth: 0,
                             circumference: 180,
                             rotation: 270,
