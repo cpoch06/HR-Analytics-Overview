@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Performance Analysis</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+    <style>
+        /* General styling for a professional look and feel */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f8f9fa; /* Slightly lighter background */
+            margin: 0;
+            padding: 2rem; /* Add padding around the body */
+            box-sizing: border-box;
+        }
+        /* Container for the chart to provide spacing and a card-like effect */
+        .chart-container {
+            background-color: #ffffff;
+            border: 1px solid #e9ecef; /* Subtle border */
+            border-radius: 16px; /* Softer radius */
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05); /* Softer shadow */
+            padding: 2rem 2.5rem; /* Increased padding */
+            width: 100%;
+            max-width: 1100px; /* Increased max-width for a larger chart */
+            margin: 0 auto; /* Center the container */
+            box-sizing: border-box;
+        }
+        /* Set a height for the canvas container to make the chart taller */
+        .canvas-wrapper {
+            height: 550px; 
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chart-container">
+    <div class="canvas-wrapper">
+        <canvas id="breakEvenChart"></canvas>
+    </div>
+</div>
+
+<script>
+    // --- DATA SETUP ---
+    // Data extracted from your provided table image.
+    const labels = ['2026', '2027', '2028'];
+    const revenueData = [16800, 22560, 28320];
+    const variableCostData = [5880, 7674, 9342];
+    const fixedCost = 18000;
+    // Total Cost is the sum of variable and fixed costs.
+    const totalCostData = variableCostData.map(vc => vc + fixedCost);
+
+    // --- BREAK-EVEN CALCULATION ---
+    const breakEvenIndex = 1.761; 
+    const breakEvenValue = 26985;
+
+    // --- CHART CONFIGURATION ---
+    const ctx = document.getElementById('breakEvenChart').getContext('2d');
+    const breakEvenChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Total Revenue',
+                    data: revenueData,
+                    borderColor: '#007bff',
+                    borderWidth: 3, // Thicker line
+                    fill: false,
+                    tension: 0.3,
+                    pointRadius: 6, // Larger data points
+                    pointBackgroundColor: '#007bff',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointHoverRadius: 8,
+                },
+                {
+                    label: 'Total Cost',
+                    data: totalCostData,
+                    borderColor: '#dc3545',
+                    borderWidth: 3, // Thicker line
+                    fill: false,
+                    tension: 0.3,
+                    pointRadius: 6, // Larger data points
+                    pointBackgroundColor: '#dc3545',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointHoverRadius: 8,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                // Main chart title
+                title: {
+                    display: true,
+                    text: 'Business Performance: Revenue vs. Cost Analysis (2026-2028)',
+                    font: {
+                        size: 22, // Larger title font
+                        weight: 'bold',
+                        family: 'Inter'
+                    },
+                    color: '#212529',
+                    padding: {
+                        bottom: 30 // More space below title
+                    }
+                },
+                // Legend configuration
+                legend: {
+                    position: 'top',
+                    align: 'end',
+                    labels: {
+                        font: {
+                            size: 14,
+                            family: 'Inter'
+                        },
+                        usePointStyle: true,
+                        boxWidth: 10,
+                        padding: 25
+                    }
+                },
+                // Tooltip customization
+                tooltip: {
+                    enabled: true,
+                    mode: 'index',
+                    intersect: false,
+                    backgroundColor: '#343a40',
+                    titleFont: { weight: 'bold', size: 14 },
+                    bodyFont: { size: 13 },
+                    padding: 12,
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y);
+                            }
+                            return label;
+                        }
+                    }
+                },
+                // --- ANNOTATIONS for Break-Even, Profit, and Loss ---
+                annotation: {
+                    annotations: {
+                        breakEvenPoint: {
+                            type: 'point',
+                            xValue: breakEvenIndex,
+                            yValue: breakEvenValue,
+                            backgroundColor: '#28a745',
+                            radius: 8,
+                            borderColor: '#ffffff',
+                            borderWidth: 3,
+                        },
+                        breakEvenLabel: {
+                           type: 'label',
+                           xValue: breakEvenIndex,
+                           yValue: breakEvenValue,
+                           content: ['Break-Even Point', new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(breakEvenValue)],
+                           font: { size: 13, weight: '600', family: 'Inter' },
+                           color: '#343a40',
+                           yAdjust: 50, // Position label cleanly above the point
+                           backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                           padding: 8,
+                           borderRadius: 6
+                        },
+                        lossZone: {
+                            type: 'box',
+                            xMin: 0,
+                            xMax: breakEvenIndex,
+                            backgroundColor: 'rgba(220, 53, 69, 0.07)', // More subtle shading
+                            borderColor: 'transparent',
+                            drawTime: 'beforeDatasetsDraw',
+                             label: {
+                                content: 'Loss Zone',
+                                display: true,
+                                position: { x: 'center', y: 'top' }, // Position label at top of zone
+                                yAdjust: 10, // Add padding from top
+                                font: { weight: 'bold', size: 16, family: 'Inter' },
+                                color: 'rgba(220, 53, 69, 0.5)'
+                             }
+                        },
+                        profitZone: {
+                            type: 'box',
+                            xMin: breakEvenIndex,
+                            xMax: labels.length - 1,
+                            backgroundColor: 'rgba(40, 167, 69, 0.08)', // More subtle shading
+                            borderColor: 'transparent',
+                            drawTime: 'beforeDatasetsDraw',
+                            label: {
+                                content: 'Profit Zone',
+                                display: true,
+                                position: { x: 'center', y: 'top' }, // Position label at top of zone
+                                yAdjust: 10, // Add padding from top
+                                font: { weight: 'bold', size: 16, family: 'Inter' },
+                                color: 'rgba(40, 167, 69, 0.6)'
+                             }
+                        }
+                    }
+                }
+            },
+            // --- AXES CONFIGURATION ---
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Amount (USD)',
+                        font: { size: 15, weight: '600', family: 'Inter' },
+                        color: '#6c757d'
+                    },
+                    ticks: {
+                        callback: function(value) { return '$' + (value / 1000) + 'k'; },
+                        font: { size: 13, family: 'Inter' },
+                        color: '#6c757d',
+                        maxTicksLimit: 7
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)', // Fainter grid lines
+                        borderDash: [5, 5], // Dashed grid lines
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Year',
+                        font: { size: 15, weight: '600', family: 'Inter' },
+                        color: '#6c757d'
+                    },
+                    ticks: {
+                        font: { size: 13, family: 'Inter' },
+                        color: '#6c757d'
+                    },
+                    grid: {
+                        display: false // No vertical grid lines
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
