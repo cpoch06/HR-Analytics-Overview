@@ -3,31 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Business Performance Analysis</title>
+    <title>Projected Monthly Business Performance</title>
+    <!-- Using a modern, clean font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js library for creating the chart -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- Chart.js plugin for annotations (like the break-even line) -->
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
     <style>
         /* General styling for a professional look and feel */
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f8f9fa; /* Slightly lighter background */
+            background-color: #f8f9fa;
             margin: 0;
-            padding: 2rem; /* Add padding around the body */
+            padding: 2rem;
             box-sizing: border-box;
         }
         /* Container for the chart to provide spacing and a card-like effect */
         .chart-container {
             background-color: #ffffff;
-            border: 1px solid #e9ecef; /* Subtle border */
-            border-radius: 16px; /* Softer radius */
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05); /* Softer shadow */
-            padding: 2rem 2.5rem; /* Increased padding */
+            border: 1px solid #e9ecef;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+            padding: 2rem 2.5rem;
             width: 100%;
-            max-width: 1100px; /* Increased max-width for a larger chart */
-            margin: 0 auto; /* Center the container */
+            max-width: 1100px;
+            margin: 0 auto;
             box-sizing: border-box;
         }
         /* Set a height for the canvas container to make the chart taller */
@@ -41,52 +44,52 @@
 
 <div class="chart-container">
     <div class="canvas-wrapper">
-        <canvas id="breakEvenChart"></canvas>
+        <canvas id="monthlyBreakEvenChart"></canvas>
     </div>
 </div>
 
 <script>
-    // --- DATA SETUP ---
-    // Data extracted from your provided table image.
+    // --- DATA SETUP (from new "Projected Average Monthly" table) ---
     const labels = ['2026', '2027', '2028'];
-    const revenueData = [16800, 22560, 28320];
-    const variableCostData = [5880, 7674, 9342];
-    const fixedCost = 18000;
-    // Total Cost is the sum of variable and fixed costs.
-    const totalCostData = variableCostData.map(vc => vc + fixedCost);
+    const revenueData = [1400, 1880, 2360];
+    const variableCostData = [365, 533, 701];
+    const fixedCost = 1500;
+    // Total Cost = Variable Cost + Fixed Cost
+    const totalCostData = variableCostData.map(vc => vc + fixedCost); // [1865, 2033, 2201]
 
     // --- BREAK-EVEN CALCULATION ---
-    const breakEvenIndex = 1.761; 
-    const breakEvenValue = 26985;
+    // Solved for the intersection of the revenue and cost lines
+    const breakEvenIndex = 1.49; 
+    const breakEvenValue = 2115;
 
     // --- CHART CONFIGURATION ---
-    const ctx = document.getElementById('breakEvenChart').getContext('2d');
-    const breakEvenChart = new Chart(ctx, {
+    const ctx = document.getElementById('monthlyBreakEvenChart').getContext('2d');
+    const monthlyBreakEvenChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
             datasets: [
                 {
-                    label: 'Total Revenue',
+                    label: 'Total Monthly Revenue',
                     data: revenueData,
                     borderColor: '#007bff',
-                    borderWidth: 3, // Thicker line
+                    borderWidth: 3,
                     fill: false,
                     tension: 0.3,
-                    pointRadius: 6, // Larger data points
+                    pointRadius: 6,
                     pointBackgroundColor: '#007bff',
                     pointBorderColor: '#fff',
                     pointBorderWidth: 2,
                     pointHoverRadius: 8,
                 },
                 {
-                    label: 'Total Cost',
+                    label: 'Total Monthly Cost',
                     data: totalCostData,
                     borderColor: '#dc3545',
-                    borderWidth: 3, // Thicker line
+                    borderWidth: 3,
                     fill: false,
                     tension: 0.3,
-                    pointRadius: 6, // Larger data points
+                    pointRadius: 6,
                     pointBackgroundColor: '#dc3545',
                     pointBorderColor: '#fff',
                     pointBorderWidth: 2,
@@ -98,35 +101,29 @@
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                // Main chart title
                 title: {
                     display: true,
-                    text: 'Business Performance: Revenue vs. Cost Analysis (2026-2028)',
+                    text: 'Projected Average Monthly Performance (2026-2028)',
                     font: {
-                        size: 22, // Larger title font
+                        size: 22,
                         weight: 'bold',
                         family: 'Inter'
                     },
                     color: '#212529',
                     padding: {
-                        bottom: 30 // More space below title
+                        bottom: 30
                     }
                 },
-                // Legend configuration
                 legend: {
                     position: 'top',
                     align: 'end',
                     labels: {
-                        font: {
-                            size: 14,
-                            family: 'Inter'
-                        },
+                        font: { size: 14, family: 'Inter' },
                         usePointStyle: true,
                         boxWidth: 10,
                         padding: 25
                     }
                 },
-                // Tooltip customization
                 tooltip: {
                     enabled: true,
                     mode: 'index',
@@ -177,14 +174,14 @@
                             type: 'box',
                             xMin: 0,
                             xMax: breakEvenIndex,
-                            backgroundColor: 'rgba(220, 53, 69, 0.07)', // More subtle shading
+                            backgroundColor: 'rgba(220, 53, 69, 0.07)',
                             borderColor: 'transparent',
                             drawTime: 'beforeDatasetsDraw',
                              label: {
                                 content: 'Loss Zone',
                                 display: true,
-                                position: { x: 'center', y: 'top' }, // Position label at top of zone
-                                yAdjust: 10, // Add padding from top
+                                position: { x: 'center', y: 'top' },
+                                yAdjust: 10,
                                 font: { weight: 'bold', size: 16, family: 'Inter' },
                                 color: 'rgba(220, 53, 69, 0.5)'
                              }
@@ -193,14 +190,14 @@
                             type: 'box',
                             xMin: breakEvenIndex,
                             xMax: labels.length - 1,
-                            backgroundColor: 'rgba(40, 167, 69, 0.08)', // More subtle shading
+                            backgroundColor: 'rgba(40, 167, 69, 0.08)',
                             borderColor: 'transparent',
                             drawTime: 'beforeDatasetsDraw',
                             label: {
                                 content: 'Profit Zone',
                                 display: true,
-                                position: { x: 'center', y: 'top' }, // Position label at top of zone
-                                yAdjust: 10, // Add padding from top
+                                position: { x: 'center', y: 'top' },
+                                yAdjust: 10,
                                 font: { weight: 'bold', size: 16, family: 'Inter' },
                                 color: 'rgba(40, 167, 69, 0.6)'
                              }
@@ -211,22 +208,23 @@
             // --- AXES CONFIGURATION ---
             scales: {
                 y: {
-                    beginAtZero: true,
+                    beginAtZero: false, // Allow y-axis to start closer to data for better detail
                     title: {
                         display: true,
-                        text: 'Amount (USD)',
+                        text: 'Average Monthly Amount (USD)',
                         font: { size: 15, weight: '600', family: 'Inter' },
                         color: '#6c757d'
                     },
                     ticks: {
-                        callback: function(value) { return '$' + (value / 1000) + 'k'; },
+                        // Format as full currency since values are smaller
+                        callback: function(value) { return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits:0 }).format(value); },
                         font: { size: 13, family: 'Inter' },
                         color: '#6c757d',
-                        maxTicksLimit: 7
+                        maxTicksLimit: 8
                     },
                     grid: {
-                        color: 'rgba(0, 0, 0, 0.05)', // Fainter grid lines
-                        borderDash: [5, 5], // Dashed grid lines
+                        color: 'rgba(0, 0, 0, 0.05)',
+                        borderDash: [5, 5],
                     }
                 },
                 x: {
@@ -241,7 +239,7 @@
                         color: '#6c757d'
                     },
                     grid: {
-                        display: false // No vertical grid lines
+                        display: false
                     }
                 }
             }
